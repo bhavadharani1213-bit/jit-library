@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Library</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#97ebf4,#97ebf4);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .register-container {
+      width: 500px;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2045ff;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .radio-group {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .radio-group input {
+      width: auto;
+      margin-right: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(90deg,#3953ff, #3953ff);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #24c5ff, #00aaff);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    a {
+      color: #4a3dfb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .message {
+      position: absolute;
+      top: -55px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      display: none;
+      text-align: center;
+    }
+
+    .message.success {
+      background: #d4f7dc;
+      color: #1f6f3d;
+      border: 1px solid #34a853;
+    }
+
+    .message.error {
+      background: #ffe3e3;
+      color: #a33a3a;
+      border: 1px solid #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="message" id="msgBox"></div>
+    <h2>Library Registration</h2>
+    <form id="regForm">
+      <label>Role</label>
+      <div class="radio-group">
+        <label><input type="radio" name="role" value="Student" required> Student</label>
+        <label><input type="radio" name="role" value="Staff" required> Staff</label>
+        <label><input type="radio" name="role" value="Admin" required> Admin</label>
+      </div>
+
+      <label>Name</label>
+      <input type="text" name="name" required>
+
+      <label>Department</label>
+      <select name="department" required>
+        <option value="">Select</option>
+        <option value="AIDS">AIDS</option>
+        <option value="CSE">CSE</option>
+        <option value="IT">IT</option>
+        <option value="MECH">MECH</option>
+        <option value="ECE">ECE</option>
+        <option value="MBA">MBA</option>
+      </select>
+
+      <label>Year <span style="font-size: 12px; color: gray;">(Only for Students)</span></label>
+      <select name="year">
+        <option value="">Select Year</option>
+        <option value="I">I</option>
+        <option value="II">II</option>
+        <option value="III">III</option>
+        <option value="IV">IV</option>
+      </select>
+
+      <label>Roll Number</label>
+      <input type="text" name="rollno" required>
+
+      <label>UG ID</label>
+      <input type="text" name="ugid" required>
+
+      <label>Email</label>
+      <input type="email" name="email" required>
+
+      <label>Phone Number</label>
+      <input type="tel" name="phone" required>
+
+      <label>Password (6-digit only)</label>
+      <input type="password" name="password" pattern="\d{6}" required>
+
+      
+      <button type="submit">Register</button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href="/login">Login here</a>
+    </div>
+  </div>
+
+<script>
+  const form = document.getElementById('regForm');
+  const msgBox = document.getElementById('msgBox');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault(); // prevent page reload
+
+    const data = new FormData(form);
+    const pwd = data.get("password");
+    
+    if (!/^\d{6}$/.test(pwd)) return showMessage("Password must be exactly 6 digits", "error");
+
+    const body = {
+      role: data.get("role"),
+      name: data.get("name"),
+      department: data.get("department"),
+      year: data.get("year") || null,
+      rollno: data.get("rollno"),
+      ugid: data.get("ugid"),
+      email: data.get("email"),
+      phone: data.get("phone"),
+      password: data.get("password")
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        showMessage("Registered successfully!", "success");
+        setTimeout(() => {
+          window.location.href = "login.html"; // ✅ redirect to login page
+        }, 2000);
+      } else {
+        showMessage(result.error || "Registration failed", "error");
+      }
+    } catch (err) {
+      showMessage("Something went wrong!", "error");
+      console.error(err);
+    }
+  });
+
+  function showMessage(text, type) {
+    msgBox.textContent = text;
+    msgBox.className = 'message ' + type;
+    msgBox.style.display = 'block';
+    setTimeout(() => msgBox.style.display = 'none', 2500);
+  }
+</script>
+
+
+</body>
+</html>

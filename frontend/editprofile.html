@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-weight: 500;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"],
+    .form-group input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .form-group input[type="file"] {
+      padding: 5px;
+    }
+
+    .button {
+      background-color: #004aad;
+      color: #fff;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .button:hover {
+      background-color: #003d8f;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      text-decoration: none;
+      color: #004aad;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Edit Profile</h2>
+    <form action="#" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="Enter your full name" required />
+      </div>
+      <div class="form-group">
+        <label for="ugid">UG ID</label>
+        <input type="text" id="ugid" placeholder="Enter your UG ID" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Change Password</label>
+        <input type="password" id="password" placeholder="New password" />
+      </div>
+      <button type="submit" class="button">Save Changes</button>
+    </form>
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+  </div>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const userId = localStorage.getItem("user_id"); 
+  if (!userId) {
+    alert("User not logged in!");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Fetch current profile details
+  try {
+    const res = await fetch(`http://127.0.0.1:5000/api/users/profile/${userId}`);
+    if (!res.ok) throw new Error("Failed to load profile");
+    const data = await res.json();
+
+    // Prefill form
+    document.getElementById("name").value = data.name || "";
+    document.getElementById("ugid").value = data.ug_id || "";  // ✅ fixed
+    document.getElementById("email").value = data.email || "";
+  } catch (err) {
+    console.error(err);
+    alert("Error loading profile");
+  }
+
+  // Handle form submission
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const ugid = document.getElementById("ugid").value;
+    const email = document.getElementById("email").value;
+    const newPassword = document.getElementById("password").value;
+
+    try {
+      // 1️⃣ Update profile info
+      const profileRes = await fetch(`http://127.0.0.1:5000/api/users/profile/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, ug_id: ugid }) // ✅ include ug_id too
+      });
+      const profileData = await profileRes.json();
+
+      if (!profileRes.ok) {
+        alert(profileData.error || "Failed to update profile");
+        return;
+      }
+
+      // 2️⃣ If password field is filled, update password
+      if (newPassword.trim() !== "") {
+        const pwRes = await fetch(`http://127.0.0.1:5000/api/users/password/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            old_password: prompt("Enter your current password to confirm:"),
+            new_password: newPassword
+          })
+        });
+
+        const pwData = await pwRes.json();
+        if (!pwRes.ok) {
+          alert(pwData.error || "Failed to change password");
+          return;
+        }
+      }
+
+      alert("Profile updated successfully!");
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong!");
+    }
+  });
+});
+</script>
+
+</body>
+</html>

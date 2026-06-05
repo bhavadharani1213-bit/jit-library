@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Library</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("images/clg.JPG") no-repeat center center/cover;
+  }
+
+  .login-container {
+    position: relative;
+    background: #ffffff;
+    border-radius: 15px;
+    width: 350px;
+    padding: 20px;
+    border: 2px solid #ddd; /* Border added */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Soft shadow */
+    text-align: center;
+  }
+
+  /* Logo + Name Section */
+  .top-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .top-logo img {
+    height: 40px;
+    margin-bottom: 8px;
+  }
+
+  .top-logo span {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+  }
+
+  /* Heading */
+  h2 {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #000;
+  }
+
+  /* Input fields */
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* Login button */
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #0000FF;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #52B2BF;
+  }
+
+  /* Register link */
+  p {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  a {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="top-logo">
+      <img src="images/logo.jpeg" alt="College Logo">
+      <span>JEPPIAAR INSTITUTE OF TECHNOLOGY - AUTONOMOUS</span>
+    </div>
+    <h2>Library Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password (6 digits)" required>
+      <button type="submit">Login</button>
+      <p id="error" class="error"></p>
+    </form>
+    <p>Don't have an account? <a href="register.html">Register Here</a></p>
+  </div>
+  <!-- Wave background layers -->
+  <div class="wave"></div>
+  <div class="wave"></div>
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const response = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: "include"
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            console.log("User data:", result.user);
+
+            // ✅ Store user info
+            localStorage.setItem("user", JSON.stringify(result.user));
+
+            // Store user_id separately for profile page
+            localStorage.setItem("user_id", result.user.id);
+
+            // ✅ Store redirect page decided by backend
+            localStorage.setItem("redirectAfterSplash", result.redirect);
+
+            // ✅ Go to splash page
+            window.location.href = "splash.html";
+        } else {
+            alert(result.message || "Login failed.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+    }
+});
+</script>
+</body>
+</html>

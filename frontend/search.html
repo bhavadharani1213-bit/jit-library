@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .book-card {
+            background: #f8f8f8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .book-card h3 {
+            margin: 0 0 5px;
+        }
+        .book-info {
+            font-size: 14px;
+            color: #555;
+        }
+        .reserve-btn, .ebook-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 8px;
+            margin-right: 5px;
+        }
+        .reserve-btn {
+            background: #3498db;
+            color: #fff;
+        }
+        .reserve-btn:hover {
+            background: #2980b9;
+        }
+        .ebook-btn {
+            background: #27ae60;
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .ebook-btn:hover {
+            background: #1e874b;
+        }
+        .disabled-btn {
+            background: gray;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h2>Search Results</h2>
+    <div id="results"></div>
+<script>
+    const params = new URLSearchParams(window.location.search);
+
+    // Detect filters
+    const query = params.get("q")?.trim();
+    const hasAdvancedFilters = Array.from(params.keys()).some(key => key !== "q");
+
+    const resultsDiv = document.getElementById("results");
+    let apiUrl = "";
+
+    if (hasAdvancedFilters) {
+        // If we have any filter other than q → advanced search
+        apiUrl = `http://127.0.0.1:5000/api/books/advanced-search?${params.toString()}`;
+    } else if (query) {
+        // Just q → basic search
+        apiUrl = `http://127.0.0.1:5000/api/books/search?q=${encodeURIComponent(query)}`;
+    }
+
+    if (apiUrl) {
+        fetch(apiUrl, { method: "GET", credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                resultsDiv.innerHTML = data.map(b => `
+                    <div class="book-card">
+                        <h3>${b.title}</h3>
+                        <div class="book-info"><strong>Author:</strong> ${b.author || "N/A"}</div>
+                        <div class="book-info"><strong>ISBN:</strong> ${b.isbn || "N/A"}</div>
+                        <div class="book-info"><strong>Publication:</strong> ${b.publication || "N/A"}</div>
+                        <div class="book-info"><strong>Department:</strong> ${b.department || "N/A"}</div>
+                        <div class="book-info"><strong>Category:</strong> ${b.category || "N/A"}</div>
+                        <div class="book-info"><strong>Available Copies:</strong> ${b.available_count}</div>
+                        <button 
+                            class="reserve-btn" 
+                            onclick="reserveBook(${b.id})"
+                            ${b.available_count === 0 ? "disabled class='reserve-btn disabled-btn'" : ""}>
+                            ${b.available_count > 0 ? "Reserve" : "Out of Stock"}
+                        </button>
+                        ${b.ebook_url
+                            ? `<a href="${b.ebook_url}" target="_blank" class="ebook-btn">E-Book</a>`
+                            : `<button class="ebook-btn disabled-btn" disabled>No E-Book</button>`
+                        }
+                    </div>
+                `).join("");
+            } else {
+                resultsDiv.innerHTML = "No books found.";
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching books:", err);
+            resultsDiv.innerHTML = "Error fetching results.";
+        });
+    } else {
+        resultsDiv.innerHTML = "Please enter a search query.";
+    }
+
+    function reserveBook(bookId) {
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            alert("Please log in to reserve books.");
+            return;
+        }
+
+        fetch("http://127.0.0.1:5000/api/reservations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ user_id: userId, book_id: bookId })
+        })
+        .then(res => res.json())
+        .then(data => alert(data.message || "Reservation placed."))
+        .catch(err => console.error("Error reserving book:", err));
+    }
+</script>
+
+</body>
+</html>

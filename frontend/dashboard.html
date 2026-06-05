@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>College Library Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+    --bg-body: #f4f8ff; /* main page background */
+    --bg-card: #ffffff; /* general card background */
+    --bg-search:#00000096; /* search section */
+    --bg-book-reservation: #c9711296; /* book reservation */
+    --bg-most-reserved: #b3e5fc; /* most reserved books */
+    --text: #000000;
+    --muted: #6e7a89;
+    --radius: 12px;
+    --shadow: 0 12px 32px -8px rgba(31, 45, 58, 0.08);
+    --transition: 0.3s cubic-bezier(0.4, 0.2, 0.2, 1);
+    --primary: #3e83f9;
+    --primary-light: #000000;
+    --primary-dark: #ffffff;
+}
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background-color: var(--primary-dark);
+            color: #000000;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 101;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+
+        .header-subtitle {
+            font-size: 12px;
+            font-weight: normal;
+            color: #ffffff;  /* makes it slightly lighter */
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+         .header-left {
+    display: flex;
+    align-items: center;  /* keeps logo and text vertically aligned */
+    gap: 10px;            /* space between logo and text */
+}
+
+.header-logo {
+    height: 60px;   /* adjust size */
+    width: auto;    /* keeps aspect ratio */
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left; /* aligns text neatly */
+}
+
+.header-subtitle {
+    font-size: 12px;
+    font-weight: normal;
+    color: #555;
+    margin-top: 4px;
+    line-height: 1.4;
+    text-align: left;
+}
+
+
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .icon-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        
+        .notification-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: #ff1d1d;
+            border-radius: 50%;
+        }
+
+        .container {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .college-banner {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .college-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .college-banner-title {
+            position: center;
+            z-index: 2;
+            font-size: 4rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            max-width: 90%;
+            line-height: 1.2;
+        }
+
+        .search-section {
+            background: var(--card);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: -80px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            background: var(--primary);
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .voice-btn {
+            background: #97ebf4;
+        }
+        
+        .filters {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        select, input[type="text"] {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            background: #f8fafc;
+            outline: none;
+        }
+
+        .body-sections {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            flex-shrink: 0;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .book-card {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 10px;
+            background: var(--bg);
+            align-items: center;
+        }
+
+        .book-cover-placeholder {
+            width: 60px;
+            height: 80px;
+            background: #cbd5e1;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .book-info {
+            flex-grow: 1;
+        }
+
+        .book-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .book-meta {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+        }
+        
+        .status-reserved { background:#ffffff}
+        .status-held { background:#ffffff }
+        .status-borrowed { background:#ffffff }
+        .status-returned { background:#ffffff }
+        .status-fine { background: #ffffff}
+
+        .dropdown {
+            position: absolute;
+            top: 60px;
+            right: 24px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            width: 250px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown.left {
+            left: 24px;
+            right: auto;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Updated styling for both div and button dropdown items */
+        .dropdown-item {
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            /* New styles for buttons */
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            color: inherit;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+        
+        .dropdown-item:hover {
+            background: #f0f4f8; /* A light gray background on hover */
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 12px 0;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .body-sections {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+            }
+            .search-section {
+                margin-top: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 1.2rem;
+            }
+            .college-banner {
+                height: 300px;
+            }
+            .college-banner-title {
+                font-size: 2rem;
+            }
+            .dropdown {
+                width: 240px;
+            }
+        }
+    </style>
+</head>
+<body> 
+    <div class="header">
+        <div class="header-left">
+             <button class="icon-btn" id="hamburgerBtn" title="Menu" style="color:black; font-size:37px;">≡</button>
+             <img src="images/logo.jpeg" alt="College Logo" class="header-logo">
+             <div class="header-title-wrapper">
+            <div class="header-title">JEPPIAAR INSTITUTE OF TECHNOLOGY (AUTONOMOUS)</div>
+            <div class="header-subtitle">
+                Kunnam, TK, Sunguvarchatram, Sriperumbudur - Chennai - 631 604 
+                Affiliated to Anna University, Chennai, approved by AICTE and certified with ISO 9001:2015. 
+            </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" id="notifBtn" title="Notifications" onclick="window.location.href='notification.html'">
+            <img src="images/bellicon.png" class="icon-img" />
+    
+            </button>
+            <button class="icon-btn" id="profileBtn" title="Profile">
+            <img src="images/profileicon.jpeg" class="icon-img" />
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="college-banner">
+                <img src="images/banner.jpeg"/>
+                <div class="college-banner-title">JEPPIAAR INSTITUTE OF TECHNOLOGY</div>
+            </div>
+
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search book title..." />
+                    <button class="btn voice-btn" id="voiceBtn"> 🎙️ </button>
+                    
+                </div>
+                <div class="filters" >
+                    <div class="filter-group">
+                        <label>Department</label>
+                        <select>
+                            <option>AIDS</option>
+                            <option>CSE</option>
+                            <option>IT</option>
+                            <option>MECH</option>
+                            <option>ECE</option>
+                            <option>MBA</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select>
+                            <option>Textbook</option>
+                            <option>Novels</option>
+                            <option>E-book</option>
+                            <option>Journal</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>ISBN</label>
+                        <input type="text" placeholder="ISBN Number">
+                    </div>
+                    <div class="filter-group">
+                        <label>Year</label>
+                        <input type="text" placeholder="Year of Publication">
+                    </div>
+                    <div class="filter-group">
+                        <label>Author</label>
+                        <input type="text" placeholder="Author Name">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="body-sections">
+                <div class="sidebar">
+                    <div class="card" style="position: sticky; top: 24px;">
+                        <div class="section-title">My Books</div>
+                        <div class="book-list" id="myBooksContainer">
+
+                            <div class="book-card">
+                                <div class="book-cover-placeholder" ></div>
+                                <div class="book-info">
+                                    <div class="book-title">Artificial Intelligence</div>
+                                    <div class="book-meta">Borrowed: July 25, 2025</div>
+                                </div>
+                                <div class="pill status-borrowed">Borrowed</div>
+                            </div>
+                            <div class="book-card">
+                                <div class="book-cover-placeholder"></div>
+                                <div class="book-info">
+                                    <div class="book-title">Database Systems</div>
+                                    <div class="book-meta">Reserved: July 28, 2025</div>
+                                </div>
+                                <div class="pill status-reserved">Reserved</div>
+                            </div>
+                            <div class="book-card">
+                                <div class="book-cover-placeholder"></div>
+                                <div class="book-info">
+                                    <div class="book-title">Operating Systems</div>
+                                    <div class="book-meta">Returned: July 20, 2025</div>
+                                </div>
+                                <div class="pill status-returned">Returned</div>
+                            </div>
+                        </div>
+                        <button class="btn" style="width:100%; margin-top:24px;" onclick="window.location.href='reservation.html'">
+    + Reserve New Book
+</button>
+
+                    </div>
+                </div>
+
+                <div class="main-section">
+                    <div class="card">
+                        <div class="section-title">Most Reserved Books</div>
+                        <div class="book-list">
+                            <div class="book-card">
+                                <div class="book-cover-placeholder" style="background: #222b47;"></div>
+                                <div class="book-info">
+                                    <div class="book-title">Python Crash Course</div>
+                                    <div class="book-meta">By Eric Matthes</div>
+                                </div>
+                            </div>
+                            <div class="book-card">
+                                <div class="book-cover-placeholder" style="background: #d1d5db;"></div>
+                                <div class="book-info">
+                                    <div class="book-title">The Lean Startup</div>
+                                    <div class="book-meta">By Eric Ries</div>
+                                </div>
+                            </div>
+                            <div class="book-card">
+                                <div class="book-cover-placeholder" style="background: #ffedd5;"></div>
+                                <div class="book-info">
+                                    <div class="book-title">Sapiens: A Brief History of Humankind</div>
+                                    <div class="book-meta">By Yuval Noah Harari</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profileDropdown" class="dropdown">
+        <div class="profile-info">
+            <div class="profile-avatar">D</div>
+            <div>
+                <div style="font-weight:700;" id="profileName">User Name</div>
+                <div style="font-size:0.85rem; color:var(--muted);" id="profileDept">Department</div>
+                <div style="font-size:0.85rem; color:var(--muted);" id="profileEmail">Email</div>
+                <div style="font-size:0.85rem; color:var(--muted);" id="profileUGID">UG ID</div>
+            </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="window.location.href='editprofile.html'"> Edit Profile Info</div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="window.location.href='borrow.html'">Borrowing History</div>
+        <div class="dropdown-item" onclick="window.location.href='fines.html'">Fines</div>
+        <div class="dropdown-item" onclick="window.location.href='returnedbook.html'">Returned Books</div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="window.location.href='logout.html'">Logout</div>
+    </div>
+
+    <!-- The updated hamburger dropdown using buttons -->
+    <div id="hamburgerDropdown" class="dropdown left">
+        <button class="dropdown-item" onclick="window.location.href='help.html'">Help & Support</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" onclick="window.location.href='visit_history.html'">Visit History</button>
+    </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // ✅ Load user from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user || !user.email) {
+      alert("Please log in first!");
+      window.location.href = "login.html";
+    }
+
+    // 🧑‍🎓 Fill Profile Data
+    const avatar = document.querySelector(".profile-avatar");
+    const nameElem = document.getElementById("profileName");
+    const deptElem = document.getElementById("profileDept");
+    const emailElem = document.getElementById("profileEmail");
+    const ugidElem = document.getElementById("profileUGID");
+
+    if (avatar) avatar.textContent = user.name.charAt(0).toUpperCase();
+    if (nameElem) nameElem.textContent = user.name;
+    if (deptElem) deptElem.textContent = `${user.role} • ${user.department || "N/A"}`;
+    if (emailElem) emailElem.textContent = user.email;
+    if (ugidElem) ugidElem.textContent = `UG ID: ${user.ug_id}`;
+
+    // 📚 Load "My Books" section
+    async function loadMyBooks() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/user/borrowed-books?email=${user.email}`)
+
+        const data = await res.json();
+
+        const bookList = document.querySelector(".sidebar .book-list");
+        bookList.innerHTML = "";
+
+        if (data.books && data.books.length > 0) {
+          data.books.forEach(book => {
+            const card = document.createElement("div");
+            card.className = "book-card";
+            card.innerHTML = `
+              <div class="book-cover-placeholder"></div>
+              <div class="book-info">
+                <div class="book-title">${book.title}</div>
+                <div class="book-meta">${book.status_date_type}: ${book.date}</div>
+              </div>
+              <div class="pill status-${book.status.toLowerCase()}">${book.status}</div>
+            `;
+            bookList.appendChild(card);
+          });
+        } else {
+          bookList.innerHTML = "<p>No books to display yet.</p>";
+        }
+      } catch (err) {
+        console.error("Failed to load user books:", err);
+      }
+    }
+
+    // 📈 Load "Most Reserved Books" section
+    async function loadPopularBooks() {
+      try {
+        const res = await fetch("http://localhost:5000/api/books/popular");
+        const data = await res.json();
+
+        const list = document.querySelector(".main-section .book-list");
+        list.innerHTML = "";
+
+        if (data.books && data.books.length > 0) {
+          data.books.forEach(book => {
+            const card = document.createElement("div");
+            card.className = "book-card";
+            card.innerHTML = `
+              <div class="book-cover-placeholder" style="background:#e2e8f0;"></div>
+              <div class="book-info">
+                <div class="book-title">${book.title}</div>
+                <div class="book-meta">By ${book.author}</div>
+              </div>
+            `;
+            list.appendChild(card);
+          });
+        } else {
+          list.innerHTML = "<p>No popular books found.</p>";
+        }
+      } catch (err) {
+        console.error("Failed to load popular books:", err);
+      }
+    }
+
+    // ⬇️ Dropdown Toggles
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('hamburgerDropdown').style.display = 'none';
+    });
+
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const hamburgerDropdown = document.getElementById('hamburgerDropdown');
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hamburgerDropdown.style.display = hamburgerDropdown.style.display === 'block' ? 'none' : 'block';
+      profileDropdown.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.style.display = 'none';
+      }
+      if (!hamburgerBtn.contains(e.target) && !hamburgerDropdown.contains(e.target)) {
+        hamburgerDropdown.style.display = 'none';
+      }
+    });
+
+    // 🎙️ Voice Search
+    const voiceBtn = document.getElementById('voiceBtn');
+    const searchInput = document.querySelector('.search-bar input');
+
+    if (voiceBtn && searchInput) {
+      voiceBtn.addEventListener('click', () => {
+        if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+          alert("Voice search is not supported by your browser.");
+          return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        voiceBtn.innerHTML = '🎙️ Listening...';
+        voiceBtn.style.background = '#f59e0b';
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          searchInput.value = transcript;
+          voiceBtn.innerHTML = '🎙️';
+          voiceBtn.style.background = '#10b981';
+        };
+
+        recognition.onend = () => {
+          voiceBtn.innerHTML = '🎙️';
+          voiceBtn.style.background = '#10b981';
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          alert(`An error occurred: ${event.error}`);
+          voiceBtn.innerHTML = '🎙️';
+          voiceBtn.style.background = '#10b981';
+        };
+
+        recognition.start();
+      });
+    }
+
+    // 🎛️ Toggle Advanced Filters
+    const toggleBtn = document.getElementById("toggleAdvBtn");
+    const advFilters = document.getElementById("advancedFilters");
+
+    if (toggleBtn && advFilters) {
+      toggleBtn.addEventListener("click", () => {
+        advFilters.style.display = advFilters.style.display === "grid" ? "none" : "grid";
+      });
+    }
+
+    // 🔄 Load all dynamic data
+    loadMyBooks();
+    loadPopularBooks();
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.querySelector(".search-bar input");
+    const searchBtn = document.createElement("button");
+    searchBtn.textContent = "Search";
+    searchBtn.classList.add("btn");
+    document.querySelector(".search-bar").appendChild(searchBtn);
+
+    function goToSearch() {
+        // collect filter values
+        const title = searchInput.value.trim();
+        const department = document.querySelector(".filters select:nth-of-type(1)")?.value || "";
+        const category = document.querySelector(".filters select:nth-of-type(2)")?.value || "";
+        const isbn = document.querySelector(".filters input[placeholder='ISBN Number']")?.value.trim() || "";
+        const year = document.querySelector(".filters input[placeholder='Year of Publication']")?.value.trim() || "";
+        const author = document.querySelector(".filters input[placeholder='Author Name']")?.value.trim() || "";
+
+        // build query string
+        const params = new URLSearchParams();
+        if (title) params.append("title", title);
+        if (author) params.append("author", author);
+        if (category) params.append("category", category);
+        if (department) params.append("department", department);
+        if (isbn) params.append("isbn", isbn);
+        if (year) params.append("year_of_publication", year);
+
+        // redirect to search.html with all params
+        if ([...params].length > 0) {
+            window.location.href = `search.html?${params.toString()}`;
+        } else {
+            alert("Please enter a search term or filter.");
+        }
+    }
+
+    searchBtn.addEventListener("click", goToSearch);
+    searchInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            goToSearch();
+        }
+    });
+});
+</script>
+
+
+</body>
+</html>

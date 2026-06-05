@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel | Library Automation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    .header {
+    background-color: #ffffff; /* deep blue */
+    color: white;
+    padding: 24px 16px;
+    text-align: center; /* centers content */
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #000000;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* subtle glow */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+    :root {
+      --bg: #d4ffff;
+      --card:#ffffff;
+      --text:#2e3e56;
+      --radius:12px;
+      --shadow:0 8px 30px rgba(0,0,0,0.05);
+      --primary:#4a69bd;
+      --muted:#9aa5c1;
+    }
+    [data-theme=dark] {
+      --bg:#1f2430;
+      --card:#2b2f44;
+      --text:#dce1f2;
+      --muted:#6f7a9e;
+      --primary:#667eea;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      transition: background .3s, color .3s;
+    }
+    .layout{
+      display:flex;
+      min-height:100vh;
+    }
+    .brand{
+      font-weight:700;
+      font-size:1.2rem;
+      margin-bottom:5px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .nav{
+      flex:1;
+    }
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      margin-bottom:4px;
+      font-size:14px;
+      position:relative;
+      text-decoration:none;
+      color: var(--text);
+      transition: background .2s;
+    }
+    .nav-item.active, .nav-item:hover{
+      background: rgba(74,105,189,.1);
+    }
+    .nav-item span.icon{
+      display:inline-flex;
+      width:20px;
+      justify-content:center;
+    }
+    .sidebar small{
+      color: var(--muted);
+    }
+    /* Settings */
+    .settings button {
+    padding: 8px 14px;
+    border: none;
+    background: var(--primary, #3498db);
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  .settings button:hover {
+    opacity: 0.9;
+  }
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .profile-card img {
+    border-radius: 50%;
+  }
+  .small {
+    font-size: 0.9em;
+    color: gray;
+  }
+  .dark-theme {
+    background: #222;
+    color: white;
+  }
+    /* Main area */
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 24px;
+      gap:10px;
+    }
+    .breadcrumbs{
+      font-size:.9rem;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .top-right{
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .btn{
+      padding:8px 16px;
+      border:none;
+      background: var(--primary);
+      color:#fff;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .card-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px;
+      padding:0 24px 24px;
+    }
+    .card{
+      background: var(--card);
+      border-radius: var(--radius);
+      padding:18px 20px;
+      box-shadow: var(--shadow);
+      position:relative;
+    }
+    .card h4{
+      margin:0 0 10px;
+      font-size:1rem;
+    }
+    .stats{
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+    .stat{
+      flex:1;
+      min-width:150px;
+      background: linear-gradient(135deg,var(--primary) 0%, #4f71e3);
+      color:#fff;
+      padding:16px 18px;
+      border-radius:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .stat small{
+      display:block;
+      font-size:11px;
+      opacity:.9;
+    }
+    .stat .number{
+      font-size:1.6rem;
+      font-weight:700;
+      margin-top:4px;
+    }
+    .recent{
+      margin-top:20px;
+    }
+    .table-wrapper{
+      overflow-x:auto;
+      margin-top:10px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    th, td{
+      padding:10px 12px;
+      text-align:left;
+      border-bottom:1px solid rgba(0,0,0,0.05);
+    }
+    th{
+      background:rgba(0,0,0,0.02);
+      position:sticky;
+      top:0;
+    }
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      background:#e7e9fc;
+      color: var(--primary);
+      font-weight:600;
+    }
+    .badge.good{background:#d4f5e0;color:#1a8f5b;}
+    .badge.warn{background:#fff3cd;color:#946d00;}
+    .badge.bad{background:#f8d7da;color:#a94442;}
+    .flex{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    /* Approve and Reject */
+    .badge.good { background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px; }
+    .badge.warn { background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; }
+    .badge.danger { background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; }
+    /* Tabs container */
+    .tabs{
+      padding:0 24px 24px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .tab-btn{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.1);
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:13px;
+      flex:1;
+      min-width:120px;
+      text-align:center;
+      transition:background .2s,box-shadow .2s;
+    }
+    .tab-btn.active{
+      background: var(--primary);
+      color:#fff;
+      box-shadow:0 12px 30px rgba(61, 105, 224, 0.3);
+    }
+    /* Books Management */
+    .badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f1c40f;
+    color: white;
+    font-size: 0.8em;
+  }
+  .badge.good {
+    background: #27ae60;
+  }
+  button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    opacity: 0.9;
+  }
+    /* Search + filter small */
+    .inline-search{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+      align-items:center;
+    }
+    .inline-search input, .inline-search select{
+      padding:8px 12px;
+      border-radius:6px;
+      border:1px solid #dfe3ee;
+      font-size:13px;
+      flex:1;
+      min-width:150px;
+    }
+
+    .activity-list{
+      max-height:200px;
+      overflow:auto;
+    }
+    .activity-item{
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      border-bottom:1px solid rgba(0,0,0,0.05);
+      font-size:13px;
+    }
+
+    /* Analytics small bars/pie placeholders */
+    .chart{
+      margin-top:10px;
+    }
+    .bar-chart{
+      display:flex;
+      gap:6px;
+      align-items:flex-end;
+      height:100px;
+    }
+    .bar{
+      flex:1;
+      background:#dfe3ee;
+      border-radius:6px 6px 0 0;
+      position:relative;
+    }
+    .bar-inner{
+      position:absolute;
+      bottom:0;
+      left:0;
+      right:0;
+      background: var(--primary);
+      border-radius:6px 6px 0 0;
+    }
+    .pie{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      background: conic-gradient(#4a69bd 0 40%, #ffcc00 40% 70%, #23b7e5 70% 100%);
+      position:relative;
+    }
+    .legend{
+      font-size:12px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+    .legend-swatch{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .swatch-box{
+      width:12px;
+      height:12px;
+      display:inline-block;
+      border-radius:3px;
+    }
+    .settings{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .profile-card{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .profile-card img{
+      width:50px;
+      height:50px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .small{
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    /* modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.4);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:999;
+    }
+    .modal{
+      background: var(--card);
+      border-radius:12px;
+      padding:24px;
+      width:100%;
+      max-width:500px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2);
+      position:relative;
+    }
+    .modal h3{margin-top:0;}
+    .close-btn{
+      position:absolute;
+      top:14px;
+      right:14px;
+      background:none;
+      border:none;
+      font-size:18px;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .form-group{
+      margin-bottom:14px;
+    }
+    .form-group label{
+      display:block;
+      margin-bottom:4px;
+      font-size:13px;
+      font-weight:600;
+    }
+    .form-group input, .form-group select{
+      width:100%;
+      padding:10px;
+      border-radius:6px;
+      border:1px solid #dfe3ee;
+      font-size:14px;
+    }
+    .flex-between{display:flex;justify-content:space-between;align-items:center;}
+  </style>
+</head>
+<body>
+    <div class="header">
+            <div class="header-title">JEPPIAAR INSTITUTE OF TECHNOLOGY </div>
+        </div>
+<body data-theme="light">
+  </div>
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="breadcrumbs">
+          <div style="font-weight:600;">Admin Dashboard</div>
+        </div>
+        <div class="top-right">
+          <div class="btn" onclick="openAddBook()">+ Add Book</div>
+          <div style="position:relative;">
+            <div class="btn" onclick="toggleNotif()"> Notifications</div>
+            <div class="notification-box" id="notifBox" style="right:0;top:42px;">
+              <h4>Recent Alerts</h4>
+              <p>Overdue book: "AI Basics" due in 2 days</p>
+              <p>New reservation request</p>
+              <p>User login from new device</p>
+            </div>
+          </div>
+          <div style="position:relative;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Tabs -->
+      <div class="tabs">
+        <div class="tab-btn active" data-tab="dashboard">Overview</div>
+        <div class="tab-btn" data-tab="books">Books</div>
+        <div class="tab-btn" data-tab="users">Users</div>
+        <div class="tab-btn" data-tab="requests">Requests</div>
+        <div class="tab-btn" data-tab="visits">Visit Logs</div>
+        <div class="tab-btn" data-tab="analytics">Analytics</div>
+        <div class="tab-btn" data-tab="settings">Settings</div>
+      </div>
+
+      <!-- Content Panels -->
+      <div class="card-grid" id="dashboard">
+        <!-- Quick Stats -->
+        <div class="stat">
+          <small>Total Books</small>
+          <div class="number">1,230</div>
+        </div>
+        <div class="stat">
+          <small>Active Users</small>
+          <div class="number">412</div>
+        </div>
+        <div class="stat">
+          <small>Pending Requests</small>
+          <div class="number">18</div>
+        </div>
+        <div class="stat">
+          <small>Fines Collected</small>
+          <div class="number">₹ 8,450</div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card" style="grid-column:1 / -1;">
+          <div class="flex-between">
+            <div><h4>Recent Activity</h4></div>
+            <div class="small">Updated just now</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div>Reservation: "AI" by user 21CS001</div>
+              <div class="small">2 min ago</div>
+            </div>
+            <div class="activity-item">
+              <div>Return: "DBMS Concepts"</div>
+              <div class="small">10 min ago</div>
+            </div>
+            <div class="activity-item">
+              <div>New user registered: 21MECH078</div>
+              <div class="small">30 min ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Books Management -->
+<div class="card-grid" id="books" style="display:none;">
+  <div class="card" style="grid-column:1 / -1;">
+    <div class="flex-between">
+      <div><h4>Books Management</h4></div>
+      <div>
+        <input id="searchBook" type="text" placeholder="Search book..." 
+               style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+        <select id="filterDept" style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+          <option value="">Department</option>
+          <option value="AIDS">AIDS</option>
+          <option value="CSE">CSE</option>
+          <option value="IT">IT</option>
+          <option value="MECH">MECH</option>
+          <option value="MBA">MBA</option>
+          <option value="CSBS">CSBS</option>
+          <option value="ECE">ECE</option>
+        </select>
+        <select id="filterCategory" style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+          <option value="">Category</option>
+          <option value="Textbook">Textbook</option>
+          <option value="Reference">Reference</option>
+          <option value="E-book">E-book</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="booksTable">
+        <thead>
+          <tr>
+            <th>Book Name</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Dept</th>
+            <th>Category</th>
+            <th>Availability</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Data Structures</td>
+            <td>Cormen</td>
+            <td>9780262033848</td>
+            <td>CSE</td>
+            <td>Textbook</td>
+            <td><span class="badge good">Available</span></td>
+            <td>
+              <button class="editBtn">Edit</button>
+              <button class="deleteBtn" style="margin-left:6px;background:#e74c3c;">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>AI: A Modern Approach</td>
+            <td>Russell</td>
+            <td>9780136042594</td>
+            <td>CSE</td>
+            <td>Reference</td>
+            <td><span class="badge">Low</span></td>
+            <td>
+              <button class="editBtn">Edit</button>
+              <button class="deleteBtn" style="margin-left:6px;background:#e74c3c;">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+      <!-- Users Management -->
+<div class="card-grid" id="users" style="display:none;">
+  <div class="card" style="grid-column:1 / -1;">
+    <div class="flex-between">
+      <div><h4>Users Management</h4></div>
+      <div>
+        <input type="text" placeholder="Search user..." style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+        <select style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+          <option>Department</option>
+          <option>AIDS</option>
+          <option>MECH</option>
+          <option>ECE</option>
+          <option>IT</option>
+          <option>CSE</option>
+          <option>CSBS</option>
+          <option>MBA</option>
+        </select>
+        <select style="padding:8px 12px;border:1px solid #dfe3ee;border-radius:6px;font-size:13px;">
+          <option>Role</option>
+          <option>Student</option>
+          <option>Staff</option>
+          <option>Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>UG ID</th>
+            <th>Role</th>
+            <th>Dept</th>
+            <th>Borrowed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Deva Dharshini</td>
+            <td>22AIDS011</td>
+            <td>Student</td>
+            <td>AIDS</td>
+            <td>2</td>
+            <td>
+              <button class="viewBtn" data-name="Deva Dharshini" data-ugid="22AIDS011" data-role="Student" data-dept="AIDS" data-borrowed="2">View</button>
+              <button class="editBtn" data-name="Deva Dharshini" data-ugid="22AIDS011" data-role="Student" data-dept="AIDS" data-borrowed="2" style="margin-left:6px;">Edit</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Jahnavi R</td>
+            <td>21CSE099</td>
+            <td>Staff</td>
+            <td>CSE</td>
+            <td>0</td>
+            <td>
+              <button class="viewBtn" data-name="Jahnavi R" data-ugid="21CSE099" data-role="Staff" data-dept="CSE" data-borrowed="0">View</button>
+              <button class="editBtn" data-name="Jahnavi R" data-ugid="21CSE099" data-role="Staff" data-dept="CSE" data-borrowed="0" style="margin-left:6px;">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Modal -->
+<div id="userModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; padding:20px; border-radius:8px; max-width:400px; margin:10% auto; position:relative;">
+    <span id="closeModal" style="position:absolute; right:10px; top:5px; cursor:pointer; font-weight:bold;">&times;</span>
+    <h3 id="modalTitle">User Details</h3>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+      <!-- Book Requests -->
+<div class="card-grid" id="requests" style="display:none;">
+  <div class="card" style="grid-column:1 / -1;">
+    <h4>Book Requests</h4>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Book Name</th>
+            <th>Requested By</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>REQ-1021</td>
+            <td>Advanced ML</td>
+            <td>21IT005</td>
+            <td><span class="badge warn">Pending</span></td>
+            <td>
+              <button class="approveBtn">Approve</button>
+              <button class="rejectBtn" style="margin-left:6px;background:#e74c3c;">Reject</button>
+            </td>
+          </tr>
+          <tr>
+            <td>REQ-1005</td>
+            <td>Cloud Computing</td>
+            <td>21CSE033</td>
+            <td><span class="badge good">Approved</span></td>
+            <td>
+              <button disabled style="opacity:.6;">Approve</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+      <!-- Visit Logs -->
+<div class="card-grid" id="visits" style="display:none;">
+  <div class="card" style="grid-column:1 / -1;">
+    <h4>Visit Logs</h4>
+    <div class="inline-search">
+      <input id="userName" placeholder="Enter user name">
+      <select id="userRole">
+        <option value="">Role</option>
+        <option value="Student">Student</option>
+        <option value="Staff">Staff</option>
+      </select>
+      <button class="btn" id="markEntryBtn">Mark Entry</button>
+      <button class="btn" id="markExitBtn" style="background:#e67e22;">Mark Exit</button>
+    </div>
+    <div class="table-wrapper">
+      <table id="visitTable">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Entry Time</th>
+            <th>Exit Time</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+      <!-- Analytics -->
+      <div class="card-grid" id="analytics" style="display:none;">
+        <div class="card">
+          <h4>Borrowing Trends</h4>
+          <div class="bar-chart">
+            <div class="bar" style="flex:1;"><div class="bar-inner" style="height:70%;"></div></div>
+            <div class="bar" style="flex:1;"><div class="bar-inner" style="height:50%;"></div></div>
+            <div class="bar" style="flex:1;"><div class="bar-inner" style="height:90%;"></div></div>
+            <div class="bar" style="flex:1;"><div class="bar-inner" style="height:60%;"></div></div>
+            <div class="bar" style="flex:1;"><div class="bar-inner" style="height:80%;"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Department-wise Borrowing</h4>
+          <div class="pie"></div>
+          <div class="legend">
+            <div class="legend-swatch"><div class="swatch-box" style="background:#4a69bd;"></div><div>CSE</div></div>
+            <div class="legend-swatch"><div class="swatch-box" style="background:#ffcc00;"></div><div>ECE</div></div>
+            <div class="legend-swatch"><div class="swatch-box" style="background:#23b7e5;"></div><div>MECH</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Most Borrowed Books</h4>
+          <div class="activity-item">
+            <div>Data Structures</div><div class="small">120 times</div>
+          </div>
+          <div class="activity-item">
+            <div>AI: A Modern Approach</div><div class="small">98 times</div>
+          </div>
+          <div class="activity-item">
+            <div>Computer Networks</div><div class="small">75 times</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4>Overdue & Fines</h4>
+          <div class="small">Total overdue users: 14</div>
+          <div class="small">Total fines: ₹ 12,340</div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+<div class="card-grid" id="settings" style="display:none;">
+  <div class="card" style="grid-column:1 / -1;">
+    <h4>Settings & Profile</h4>
+    <div class="settings">
+      <div class="profile-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="admin" width="60">
+        <div>
+          <div id="profileName"><strong>Admin Name</strong></div>
+          <div id="profileEmail" class="small">admin@jit.edu</div>
+        </div>
+      </div>
+
+      <div class="flex" style="margin: 15px 0;">
+        <div>
+          <label>Notification Preferences</label>
+          <select>
+            <option>Email & App</option>
+            <option>Email Only</option>
+            <option>App Only</option>
+            <option>None</option>
+          </select>
+        </div>
+        <div>
+          <label>Theme</label>
+          <div class="toggle">
+            <span>Light</span>
+            <button onclick="toggleTheme()" style="margin-left:6px;padding:6px 14px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer;">Toggle</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button id="editProfileBtn">Edit Profile Info</button>
+        <button id="changePasswordBtn">Change Password</button>
+        <button id="logoutBtn" style="background:#e74c3c;">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Add Book Modal -->
+  <div class="modal-backdrop" id="addBookModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('addBookModal')">×</button>
+      <h3>Add New Book</h3>
+      <div class="form-group">
+        <label>Book Name</label>
+        <input type="text" placeholder="Enter book name">
+      </div>
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" placeholder="Author name">
+      </div>
+      <div class="form-group">
+        <label>ISBN</label>
+        <input type="text" placeholder="ISBN number">
+      </div>
+      <div class="form-group">
+        <label>Publication</label>
+        <input type="text" placeholder="Publisher">
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select>
+          <option>AIDS</option>
+          <option>CSE</option>
+          <option>IT</option>
+          <option>MECH</option>
+          <option>ECE</option>
+          <option>MBA</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select>
+          <option>Textbook</option>
+          <option>Reference</option>
+          <option>E-book</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Availability</label>
+        <input type="number" value="1">
+      </div>
+      <div class="form-group">
+        <label>E-Book Link</label>
+        <input type="text" placeholder="URL">
+      </div>
+      <button class="btn">Save Book</button>
+    </div>
+  </div>
+
+<script>
+  const API = "http://localhost:5000/api/admin";
+  document.addEventListener("DOMContentLoaded", function() {
+    fetch(`${API}/users`, { credentials: "include" })  // <-- credentials included here
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then(data => {
+        const tableBody = document.getElementById("userTableBody");
+        tableBody.innerHTML = "";
+        if (data.length === 0) {
+          tableBody.innerHTML = "<tr><td colspan='4'>No data found</td></tr>";
+          return;
+        }
+        data.forEach(user => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.role}</td>
+            <td>${user.department || "-"}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error("Error loading admin data:", error);
+        const tableBody = document.getElementById("userTableBody");
+        tableBody.innerHTML = "<tr><td colspan='4' style='color:red;'>Error loading data</td></tr>";
+      });
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // ---- Config / Helpers ----
+    const API = "http://localhost:5000/api/admin"; // same origin
+    const jsonOpts = (method="GET", body=null) => {
+      const o = {
+        method,
+        headers: { "Content-Type": "application/json" },
+        credentials: "include"  // <--- changed from "same-origin" to "include"
+      };
+      if (body !== null) o.body = JSON.stringify(body);
+      return o;
+    };
+    function toast(msg, err = false) {
+      const el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = `
+        position:fixed; right:18px; bottom:18px; padding:10px 14px; border-radius:8px;
+        color:#fff; z-index:9999; box-shadow:0 8px 24px rgba(0,0,0,0.12);
+        background:${err ? "#e74c3c" : "#27ae60"};
+        transition:opacity .3s;
+      `;
+      document.body.appendChild(el);
+      setTimeout(()=> el.style.opacity = "0", 2600);
+      setTimeout(()=> el.remove(), 3000);
+    }
+    async function apiGET(path) {
+      try {
+        const r = await fetch(API + path, jsonOpts("GET"));
+        if (!r.ok) throw new Error(await r.text());
+        return await r.json();
+      } catch (e) { toast(e.message || e, true); throw e; }
+    }
+    async function apiPOST(path, body = {}) {
+      try {
+        const r = await fetch(API + path, jsonOpts("POST", body));
+        if (!r.ok) throw new Error(await r.text());
+        return await r.json();
+      } catch (e) { toast(e.message || e, true); throw e; }
+    }
+    async function apiPUT(path, body = {}) {
+      try {
+        const r = await fetch(API + path, jsonOpts("PUT", body));
+        if (!r.ok) throw new Error(await r.text());
+        return await r.json();
+      } catch (e) { toast(e.message || e, true); throw e; }
+    }
+    async function apiDELETE(path) {
+      try {
+        const r = await fetch(API + path, jsonOpts("DELETE"));
+        if (!r.ok) throw new Error(await r.text());
+        return await r.json();
+      } catch (e) { toast(e.message || e, true); throw e; }
+    }
+    const esc = s => String(s ?? "").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+
+    // ---- Global helpers used by inline HTML (exposed on window) ----
+    window.toggleNotif = function() {
+      const box = document.getElementById("notifBox");
+      if (!box) return;
+      box.style.display = box.style.display === "block" ? "none" : "block";
+    };
+
+    window.openAddBook = function() {
+      const modal = document.getElementById("addBookModal");
+      if (!modal) return;
+      modal.style.display = "flex";
+    };
+
+    window.closeModal = function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = "none";
+    };
+
+    window.toggleTheme = function() {
+      const cur = document.documentElement.getAttribute("data-theme") || "light";
+      const next = cur === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) {}
+    };
+    // apply saved theme on load
+    (function initTheme() {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) document.documentElement.setAttribute("data-theme", saved);
+      } catch(e){}
+    })();
+
+    // ---- Tab switching (works with your .tab-btn) ----
+    const tabBtns = Array.from(document.querySelectorAll(".tab-btn"));
+    function showTab(name) {
+      const ids = ["dashboard","books","users","requests","visits","analytics","settings"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.style.display = id === name ? "" : "none";
+      });
+      tabBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+      // load data for that tab
+      if (name === "dashboard") loadOverview();
+      if (name === "books") loadBooks();
+      if (name === "users") loadUsers();
+      if (name === "requests") loadRequests();
+      if (name === "visits") loadVisits();
+      if (name === "analytics") loadAnalytics();
+      if (name === "settings") loadProfileCard();
+    }
+    tabBtns.forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+    showTab(document.querySelector(".tab-btn.active")?.dataset.tab || "dashboard");
+
+    // ---- Overview ----
+    async function loadOverview() {
+      try {
+        const data = await apiGET("/overview");
+        const statEls = Array.from(document.querySelectorAll("#dashboard .stat .number"));
+        if (statEls[0]) statEls[0].textContent = data.total_books ?? statEls[0].textContent;
+        if (statEls[1]) statEls[1].textContent = data.active_users ?? statEls[1].textContent;
+        if (statEls[2]) statEls[2].textContent = data.pending_requests ?? statEls[2].textContent;
+        if (statEls[3]) statEls[3].textContent = (typeof data.total_fines !== "undefined") ? `₹ ${data.total_fines}` : statEls[3].textContent;
+      } catch (e) { /* error toast already shown in apiGET */ }
+    }
+
+    // ---- BOOKS ----
+    const booksTbody = document.querySelector("#booksTable tbody");
+    async function loadBooks() {
+      try {
+        const books = await apiGET("/books");
+        if (!booksTbody) return;
+        booksTbody.innerHTML = "";
+        books.forEach(b => {
+          const tr = document.createElement("tr");
+          tr.dataset.bookId = b.id;
+          tr.innerHTML = `
+            <td>${esc(b.title)}</td>
+            <td>${esc(b.author)}</td>
+            <td>${esc(b.isbn || "")}</td>
+            <td>${esc(b.department || "")}</td>
+            <td>${esc(b.category || "")}</td>
+            <td>${(b.quantity && b.quantity > 0) ? '<span class="badge good">Available</span>' : '<span class="badge">Low</span>'}</td>
+            <td>
+              <button class="editBtn" data-id="${b.id}">Edit</button>
+              <button class="deleteBtn" data-id="${b.id}" style="margin-left:6px;background:#e74c3c;">Delete</button>
+            </td>`;
+          booksTbody.appendChild(tr);
+        });
+      } catch (e) {}
+    }
+
+    // Add book modal: pull inputs (modal has anonymous inputs in your markup)
+    const addBookModal = document.getElementById("addBookModal");
+    if (addBookModal) {
+      // find inputs in order as in your HTML
+      const inputs = addBookModal.querySelectorAll(".form-group input, .form-group select");
+      const saveBtn = addBookModal.querySelector(".modal .btn, .btn");
+      // show/hide already handled by openAddBook/closeModal
+      if (saveBtn) {
+        saveBtn.addEventListener("click", async () => {
+          const title = (inputs[0]?.value || "").trim();
+          const author = (inputs[1]?.value || "").trim();
+          const isbn = (inputs[2]?.value || "").trim();
+          const publication = (inputs[3]?.value || "").trim();
+          const department = (inputs[4]?.value || inputs[4]?.selectedOptions?.[0]?.value || "").trim();
+          const category = (inputs[5]?.value || inputs[5]?.selectedOptions?.[0]?.value || "").trim();
+          const quantity = Number(inputs[6]?.value || 1);
+          const ebook = (inputs[7]?.value || "").trim();
+          if (!title || !author) return toast("Title & author required", true);
+          try {
+            await apiPOST("/books", { title, author, isbn, category, quantity, ebook, publication, department });
+            toast("Book added");
+            addBookModal.style.display = "none";
+            inputs.forEach(i => { if (i.tagName === "INPUT") i.value = ""; else if (i.tagName === "SELECT") i.selectedIndex = 0; });
+            loadBooks();
+          } catch (e) {}
+        });
+      }
+      // clicking outside modal content closes it:
+      addBookModal.addEventListener("click", (ev) => { if (ev.target === addBookModal) addBookModal.style.display = "none"; });
+    }
+
+    // Delegated clicks for book edit/delete
+    document.addEventListener("click", async (e) => {
+      // delete
+      if (e.target.matches(".deleteBtn")) {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        if (!confirm("Delete book permanently?")) return;
+        try {
+          await apiDELETE(`/books/${id}`);
+          toast("Book deleted");
+          loadBooks();
+        } catch (err) {}
+      }
+      // edit
+      if (e.target.matches(".editBtn")) {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        try {
+          // get current book details from server (we only have /books list), fetch list then find
+          const list = await apiGET("/books");
+          const book = list.find(x => String(x.id) === String(id));
+          if (!book) return toast("Book not found", true);
+          const newTitle = prompt("Title:", book.title);
+          if (newTitle === null) return; // cancelled
+          const newAuthor = prompt("Author:", book.author) ?? book.author;
+          const newIsbn = prompt("ISBN:", (book.isbn || "")) ?? (book.isbn || "");
+          const newCategory = prompt("Category:", (book.category || "")) ?? (book.category || "");
+          const newQuantity = Number(prompt("Quantity:", book.quantity ?? 1) ?? book.quantity ?? 1);
+          await apiPUT(`/books/${id}`, { title: newTitle.trim(), author: newAuthor.trim(), isbn: newIsbn.trim(), category: newCategory.trim(), quantity: newQuantity });
+          toast("Book updated");
+          loadBooks();
+        } catch (err) {}
+      }
+    });
+
+    // ---- REQUESTS ----
+    const requestsTbody = document.querySelector("#requests .table-wrapper tbody") || document.querySelector("#requests tbody");
+    async function loadRequests() {
+      try {
+        const reqs = await apiGET("/book_request");
+        if (!requestsTbody) return;
+        requestsTbody.innerHTML = "";
+        reqs.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${esc(r.id)}</td>
+            <td>${esc(r.book_title)}</td>
+            <td>${esc(r.user_name)}</td>
+            <td>${r.status === "Pending" ? '<span class="badge warn">Pending</span>' : (r.status === "Approved"? '<span class="badge good">Approved</span>':'<span class="badge danger">Rejected</span>')}</td>
+            <td>
+              ${r.status === "Pending" ? `<button class="approveBtn" data-id="${r.id}">Approve</button><button class="rejectBtn" data-id="${r.id}" style="margin-left:6px;background:#e74c3c;">Reject</button>` : `<button disabled style="opacity:.6;">Approve</button>`}
+            </td>`;
+          requestsTbody.appendChild(tr);
+        });
+      } catch (e) {}
+    }
+    // delegated request approve/reject
+    document.addEventListener("click", async (e) => {
+      if (e.target.matches(".approveBtn")) {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        try { await apiPUT(`/book_request/${id}/approve`, {}); toast("Request approved"); loadRequests(); } catch (err) {}
+      }
+      if (e.target.matches(".rejectBtn")) {
+        const id = e.target.dataset.id;
+        if (!id) return;
+        try { await apiPUT(`/book_request/${id}/reject`, {}); toast("Request rejected"); loadRequests(); } catch (err) {}
+      }
+    });
+
+    // ---- USERS ----
+    const usersTbody = document.querySelector("#users table tbody");
+    async function loadUsers() {
+      try {
+        const users = await apiGET("/users");
+        if (!usersTbody) return;
+        usersTbody.innerHTML = "";
+        users.forEach(u => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${esc(u.name || u.full_name || "")}</td>
+            <td>${esc(u.ug_id || u.ugid || u.roll_no || u.id || "")}</td>
+            <td>${esc(u.role || "")}</td>
+            <td>${esc(u.department || "")}</td>
+            <td>${esc(String(u.borrowed_count ?? u.borrowed ?? 0))}</td>
+            <td>
+              <button class="viewBtn" data-user-id="${u.id}">View</button>
+            </td>`;
+          usersTbody.appendChild(tr);
+        });
+      } catch (e) {}
+    }
+
+    // User modal logic (view/deactivate/reactivate)
+    const userModal = document.getElementById("userModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+    const closeModalBtn = document.getElementById("closeModal");
+    closeModalBtn?.addEventListener("click", () => userModal.style.display = "none");
+
+    document.addEventListener("click", async (e) => {
+      if (e.target.matches(".viewBtn")) {
+        const uid = e.target.dataset.userId;
+        try {
+          const all = await apiGET("/users");
+          const u = all.find(x => String(x.id) === String(uid));
+          if (!u) return toast("User not found", true);
+          modalTitle.textContent = `User: ${u.name || u.full_name || ""}`;
+          modalContent.innerHTML = `
+            <div><strong>UG ID:</strong> ${esc(u.ug_id||u.roll_no||u.id||"")}</div>
+            <div><strong>Role:</strong> ${esc(u.role||"")}</div>
+            <div><strong>Dept:</strong> ${esc(u.department||"")}</div>
+            <div><strong>Borrowed:</strong> ${esc(String(u.borrowed_count ?? u.borrowed ?? 0))}</div>
+            <div style="margin-top:10px;">
+              <button id="deactUserBtn">Deactivate</button>
+              <button id="reactUserBtn" style="margin-left:6px;background:#2ecc71;">Reactivate</button>
+            </div>`;
+          userModal.style.display = "block";
+          document.getElementById("deactUserBtn").onclick = async () => {
+            if (!confirm("Deactivate user?")) return;
+            await apiPUT(`/user/${u.id}/deactivate`, {}); toast("User deactivated"); userModal.style.display = "none"; loadUsers();
+          };
+          document.getElementById("reactUserBtn").onclick = async () => {
+            if (!confirm("Reactivate user?")) return;
+            await apiPUT(`/user/${u.id}/reactivate`, {}); toast("User reactivated"); userModal.style.display = "none"; loadUsers();
+          };
+        } catch (err) {}
+      }
+
+      if (e.target.matches(".deactivateBtn")) {
+        const uid = e.target.dataset.userId;
+        if (!confirm("Deactivate user?")) return;
+        try { await apiPUT(`/user/${uid}/deactivate`, {}); toast("User deactivated"); loadUsers(); } catch (err) {}
+      }
+      if (e.target.matches(".reactivateBtn")) {
+        const uid = e.target.dataset.userId;
+        if (!confirm("Reactivate user?")) return;
+        try { await apiPUT(`/user/${uid}/reactivate`, {}); toast("User reactivated"); loadUsers(); } catch (err) {}
+      }
+    });
+
+    // close user modal clicking outside
+    userModal?.addEventListener("click", e => { if (e.target === userModal) userModal.style.display = "none"; });
+
+    // ---- VISITS ----
+    const visitTableBody = document.querySelector("#visitTable tbody");
+    document.getElementById("markEntryBtn")?.addEventListener("click", async () => {
+      const name = document.getElementById("visitName").value.trim();
+      const purpose = document.getElementById("visitPurpose").value.trim();
+      if (!name || !purpose) return toast("Please enter name and purpose", true);
+      try {
+        await apiPOST("/visit_log", { name, purpose });
+        toast("Entry recorded");
+        document.getElementById("visitName").value = "";
+        document.getElementById("visitPurpose").value = "";
+        loadVisits();
+      } catch (e) {}
+    });
+    async function loadVisits() {
+      try {
+        const visits = await apiGET("/visit_log");
+        if (!visitTableBody) return;
+        visitTableBody.innerHTML = "";
+        visits.forEach(v => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${esc(v.name)}</td>
+            <td>${esc(v.purpose)}</td>
+            <td>${new Date(v.time).toLocaleString()}</td>`;
+          visitTableBody.appendChild(tr);
+        });
+      } catch (e) {}
+    }
+
+    // ---- ANALYTICS ----
+    async function loadAnalytics() {
+      try {
+        const analytics = await apiGET("/analytics");
+        // render analytics in your dashboard — implement as needed
+        // For example: chart, stats, etc.
+        // Here just a console log:
+        console.log("Analytics data:", analytics);
+      } catch (e) {}
+    }
+
+    // ---- PROFILE ----
+    async function loadProfileCard() {
+      try {
+        const profile = await apiGET("/profile");
+        const card = document.getElementById("profileCard");
+        if (!card) return;
+        card.innerHTML = `
+          <h3>${esc(profile.name)}</h3>
+          <p><strong>Email:</strong> ${esc(profile.email)}</p>
+          <p><strong>Role:</strong> ${esc(profile.role)}</p>
+          <p><strong>Department:</strong> ${esc(profile.department || "-")}</p>
+        `;
+      } catch (e) {}
+    }
+
+  }); // end DOMContentLoaded
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Borrowed History</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #d4ffff, #d4ffff);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #000000;
+    }
+    .history-entry {
+      border: 1px solid #ccc;
+      border-left: 5px solid #1976d2;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      padding: 15px 20px;
+      background-color: #f9f9f9;
+    }
+    .history-entry h3 {
+      margin: 0 0 10px;
+      color: #0d47a1;
+    }
+    .history-entry p {
+      margin: 4px 0;
+      color: #333;
+    }
+    .status {
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    .status.returned {
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Borrowed Books History</h2>
+    <div id="historyContainer"></div>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.email) {
+        alert("Please log in first!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/api/borrow/history?email=${encodeURIComponent(user.email)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const container = document.querySelector(".container");
+        container.innerHTML = `<h2>Borrowed Books History</h2>`;
+
+        if (data.history.length > 0) {
+            data.history.forEach(b => {
+                container.innerHTML += `
+                    <div class="history-entry">
+                        <h3>${b.title}</h3>
+                        <p><strong>Author:</strong> ${b.author}</p>
+                        <p><strong>ISBN:</strong> ${b.isbn}</p>
+                        <p><strong>Borrowed on:</strong> ${b.borrow_date}</p>
+                        <p class="status ${b.status === "Returned" ? "returned" : ""}">
+                            Status: ${b.status}${b.return_date ? ` on ${b.return_date}` : ""}
+                        </p>
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML += `<p>No borrowed history found.</p>`;
+        }
+    } catch (err) {
+        console.error("Error loading borrow history:", err);
+        document.querySelector(".container").innerHTML = `
+            <h2>Borrowed Books History</h2>
+            <p>Error fetching data</p>
+        `;
+    }
+});
+</script>
+
+</body>
+</html>

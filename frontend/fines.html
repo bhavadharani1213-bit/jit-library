@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Fine Details</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif (#44e1ec,#a5f9ff);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #000000;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    td {
+      background-color: #ffffff;
+    }
+
+    .no-fine {
+      color: green;
+      font-weight: bold;
+    }
+
+    .fine {
+      color: red;
+      font-weight: bold;
+    }
+
+    .summary {
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Fine Details for Delayed Returns</h2>
+
+    <table>
+      <tr>
+        <th>Book Title</th>
+        <th>Category</th>
+        <th>Due Date</th>
+        <th>Returned Date</th>
+        <th>Delay (days)</th>
+        <th>Fine Amount</th>
+      </tr>
+
+      <!-- Subject Book: No Fine -->
+      <tr>
+        <td>Computer Networks</td>
+        <td>Subject</td>
+        <td>Aug 1, 2025</td>
+        <td>Aug 5, 2025</td>
+        <td>4</td>
+        <td class="no-fine">₹0</td>
+      </tr>
+
+      <!-- Journal: Fine -->
+      <tr>
+        <td>AI Research Trends 2024</td>
+        <td>Journal</td>
+        <td>Jul 25, 2025</td>
+        <td>Aug 1, 2025</td>
+        <td>7</td>
+        <td class="fine">₹14</td>
+      </tr>
+
+      <!-- eBook: Fine -->
+      <tr>
+        <td>Data Science Handbook</td>
+        <td>eBook</td>
+        <td>Jul 28, 2025</td>
+        <td>Aug 3, 2025</td>
+        <td>6</td>
+        <td class="fine">₹12</td>
+      </tr>
+
+      <!-- Reference Book: Fine -->
+      <tr>
+        <td>ML Algorithms Reference</td>
+        <td>Reference</td>
+        <td>Jul 20, 2025</td>
+        <td>Jul 25, 2025</td>
+        <td>5</td>
+        <td class="fine">₹10</td>
+      </tr>
+
+    </table>
+
+    <p class="summary">Total Fine: ₹36</p>
+  </div>
+</body>
+</html>

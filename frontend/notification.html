@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notifications • Library</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg:#f0f4fb;
+      --card:#fff;
+      --radius:12px;
+      --shadow:0 16px 40px rgba(0,0,0,0.08);
+      --text:#1f2d46;
+      --muted:#6e7a89;
+      --blue:#6366f1;
+      --green:#10b981;
+      --orange:#f59e0b;
+      --red:#ef4444;
+    }
+    *{box-sizing:border-box;}
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      padding:20px;
+    }
+    .wrapper {
+      max-width: 1100px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+    .topbar {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    h1 {
+      margin:0;
+      font-size:1.8rem;
+    }
+    .controls {
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:6px;
+    }
+    .badge {
+      background: var(--blue);
+      color:#fff;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:0.75rem;
+      display:inline-block;
+      margin-right:6px;
+    }
+    .filter-group {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .filter-group select,
+    .filter-group input {
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid rgba(31,45,58,.15);
+      font-size:0.9rem;
+      outline:none;
+    }
+    .btn {
+      padding:9px 16px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.85rem;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background: var(--blue);
+      color:#ffffff;
+      transition:.2s;
+    }
+    .btn-secondary {
+      background:#fff;
+      color: var(--text);
+      border:1px solid rgba(31,45,58,.15);
+    }
+    .btn:hover {filter:brightness(1.05);}
+    .layout {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:20px;
+    }
+    .summary-cards {
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding:18px 22px;
+      box-shadow: var(--shadow);
+      position:relative;
+      flex:1;
+      min-width:220px;
+    }
+    .notif-list {
+      list-style:none;
+      padding:0;
+      margin:0;
+    }
+    .notif-item {
+      background:#fff;
+      border-radius:10px;
+      padding:14px 18px;
+      margin-bottom:10px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      border:1px solid rgba(31,45,58,.08);
+      position:relative;
+      transition: background .2s;
+    }
+    .notif-item.unread {
+      background: #eef5ff;
+    }
+    .notif-type {
+      flex-shrink:0;
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      color:#fff;
+    }
+    .content {
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .meta {
+      font-size:12px;
+      color: var(--muted);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .actions {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:6px;
+    }
+    .pill-status {
+      padding:4px 12px;
+      border-radius:999px;
+      font-size:11px;
+      background: rgba(0,0,0,0.05);
+      display:inline-block;
+    }
+    .small {
+      font-size:12px;
+      color: var(--muted);
+    }
+    .flex {display:flex; gap:10px; align-items:center;}
+    .right {
+      margin-left:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .empty-state {
+      text-align:center;
+      padding:60px 20px;
+      color: var(--muted);
+    }
+    .pill-unread {
+      background:#2563eb;
+      color:#fff;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:10px;
+      margin-right:6px;
+    }
+    .mark-read {
+      background: transparent;
+      border:none;
+      cursor:pointer;
+      font-size:14px;
+      color: var(--muted);
+    }
+    .search-input {
+      width:240px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="topbar">
+      <div>
+        <h1>Notifications</h1>
+        <div style="font-size:13px; color:#555;">App & Email Alerts / Activity Feed</div>
+      </div>
+      <div class="right">
+        <div class="badge" id="unreadCount">0 Unread</div>
+        <button class="btn" id="markAllRead">Mark all read</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="filter-group">
+        <label for="filterType">Type:</label>
+        <select id="type-filter">
+          <option value="all">All</option>
+          <option value="overdue">Overdue Books</option>
+          <option value="reservation">Reservation Updates</option>
+          <option value="confirmation">Borrowing Confirmations</option>
+          <option value="visit">Visit Log Alerts</option>
+          <option value="reminder">Overdue Reminder (2 days)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="searchBox">Search:</label>
+        <input id="searchBox" class="search-input" placeholder="Search notifications..." />
+      </div>
+      <div class="filter-group">
+        <button class="btn-secondary" id="showUnread">Unread only</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- summary -->
+      <div class="summary-cards">
+        <div class="card" style="flex:2;">
+          <div class="section-title">
+            <div>Quick Stats</div>
+          </div>
+          <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:8px;">
+            <div style="flex:1; min-width:140px;">
+              <div style="font-size:12px; color:var(--muted);">Total Notifications</div>
+              <div style="font-weight:700; font-size:1.3rem;" id="totalNotif">0</div>
+            </div>
+            <div style="flex:1; min-width:140px;">
+              <div style="font-size:12px; color:var(--muted);">Unread</div>
+              <div style="font-weight:700; font-size:1.3rem;" id="statsUnread">0</div>
+            </div>
+            <div style="flex:1; min-width:140px;">
+              <div style="font-size:12px; color:var(--muted);">Overdue Alerts</div>
+              <div style="font-weight:700; font-size:1.3rem;" id="statsOverdue">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- list -->
+      <div class="card" style="flex:1;">
+        <div class="section-title">
+          <div>All Notifications</div>
+          <div style="font-size:12px; color: var(--muted);">Latest first</div>
+        </div>
+        <ul class="notif-list" id="notifList">
+          <!-- populated by JS -->
+        </ul>
+        <div id="empty" class="empty-state" style="display:none;">
+          No notifications matching filters.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  let allNotifications = [];
+  let showUnreadOnly = false;
+
+  async function fetchNotifications() {
+    try {
+      const userId = 1; // TODO: replace dynamically
+      const response = await fetch(`http://localhost:5000/api/notifications/all?user_id=${userId}`);
+      const data = await response.json();
+      allNotifications = data;
+      renderNotifications();
+      updateStats();
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  }
+
+  function renderNotifications() {
+    const container = document.querySelector("#notifList");
+    const typeFilter = document.querySelector("#type-filter").value;
+    const searchQuery = document.querySelector("#searchBox").value.toLowerCase();
+
+    let filtered = allNotifications;
+
+    container.innerHTML = "";
+    if (filtered.length === 0) {
+      document.querySelector("#empty").style.display = "block";
+      return;
+    }
+    document.querySelector("#empty").style.display = "none";
+
+    filtered.forEach(note => {
+      const li = document.createElement("li");
+      li.className = `notif-item ${note.seen ? "" : "unread"}`;
+      li.innerHTML = `
+        <div class="content">
+          <div>${note.message}</div>
+          <div class="meta">${new Date(note.timestamp).toLocaleString()}</div>
+        </div>
+      `;
+      li.addEventListener("click", () => markAsSeen(note.id, li));
+      container.appendChild(li);
+    });
+  }
+
+  async function markAsSeen(id, li) {
+    try {
+      await fetch("http://localhost:5000/api/notifications/seen", {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ notification_id: id })
+      });
+      li.classList.remove("unread");
+      let notif = allNotifications.find(n => n.id === id);
+      if (notif) notif.seen = true;
+      updateStats();
+    } catch (err) {
+      console.error("Error marking as seen:", err);
+    }
+  }
+
+  async function markAllAsRead() {
+    try {
+      for (let note of allNotifications) {
+        if (!note.seen) {
+          await fetch("http://localhost:5000/api/notifications/seen", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ notification_id: note.id })
+          });
+          note.seen = true;
+        }
+      }
+      renderNotifications();
+      updateStats();
+    } catch (err) {
+      console.error("Error marking all as read:", err);
+    }
+  }
+
+  function updateStats() {
+    const total = allNotifications.length;
+    const unread = allNotifications.filter(n => !n.seen).length;
+    const overdue = allNotifications.filter(n => n.category === "overdue" && !n.seen).length;
+
+    document.querySelector("#totalNotif").textContent = total;
+    document.querySelector("#statsUnread").textContent = unread;
+    document.querySelector("#statsOverdue").textContent = overdue;
+    document.querySelector("#unreadCount").textContent = `${unread} Unread`;
+  }
+
+  // ✅ Event listeners (now safe)
+  document.querySelector("#type-filter").addEventListener("change", renderNotifications);
+  document.querySelector("#searchBox").addEventListener("input", renderNotifications);
+  document.querySelector("#showUnread").addEventListener("click", () => {
+    showUnreadOnly = !showUnreadOnly;
+    renderNotifications();
+  });
+  document.querySelector("#markAllRead").addEventListener("click", markAllAsRead);
+
+  // Load initial
+  fetchNotifications();
+});
+</script>
+
+</body>
+</html>

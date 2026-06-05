@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Returned Books</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #d4ffff, #d4ffff);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #000000;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #000000;
+      text-align: left;
+    }
+
+    th {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    td {
+      background-color: #ffffff;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      color: #000000;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>RETURNED BOOKS HISTORY</h2>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Book Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Borrowed Date</th>
+          <th>Returned Date</th>
+          <th>No. of Days Taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PYTHON PROGRAMMING</td>
+          <td>John Zelle</td>
+          <td>Subject</td>
+          <td>July 10, 2025</td>
+          <td>July 20, 2025</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>DIGITAL MARKETING BASICS</td>
+          <td>Jane Doe</td>
+          <td>Reference</td>
+          <td>July 01, 2025</td>
+          <td>July 18, 2025</td>
+          <td>17</td>
+        </tr>
+        <tr>
+          <td>MACHINE LEARNING</td>
+          <td>Andrew Ng</td>
+          <td>eBook</td>
+          <td>July 05, 2025</td>
+          <td>July 25, 2025</td>
+          <td>20</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      © 2025 College Library System | All rights reserved
+    </div>
+  </div>
+<script>
+  async function loadReturnedBooks() {
+    const email = localStorage.getItem("email"); // ✅ assumes user email stored after login
+    const tableBody = document.getElementById("historyTableBody");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/reservations/history?email=${encodeURIComponent(email)}`, {
+        method: "GET",
+        credentials: "include" // ✅ important if using session cookies
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch history");
+      }
+
+      const data = await response.json();
+      tableBody.innerHTML = ""; // clear old rows
+
+      if (data.length === 0) {
+        emptyMessage.style.display = "block";
+        return;
+      } else {
+        emptyMessage.style.display = "none";
+      }
+
+      data.forEach(item => {
+        const borrowedDate = new Date(item.borrowed_date);
+        const returnedDate = new Date(item.returned_date);
+        const daysTaken = Math.ceil((returnedDate - borrowedDate) / (1000 * 60 * 60 * 24));
+
+        const row = `
+          <tr>
+            <td>${item.title}</td>
+            <td>${item.author}</td>
+            <td>${item.category}</td>
+            <td>${borrowedDate.toDateString()}</td>
+            <td>${returnedDate.toDateString()}</td>
+            <td>${daysTaken}</td>
+          </tr>
+        `;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+
+    } catch (error) {
+      console.error("Error fetching returned books:", error);
+      emptyMessage.textContent = "Error loading returned books.";
+      emptyMessage.style.display = "block";
+    }
+  }
+
+  // Load data when page opens
+  document.addEventListener("DOMContentLoaded", loadReturnedBooks);
+</script>
+</body>
+</html>

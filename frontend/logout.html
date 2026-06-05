@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logged Out</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #4facfe, #00f2fe, #9d50bb, #6a11cb);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .logout-box {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 450px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      color: #000000;
+      margin-bottom: 15px;
+      font-size: 26px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 25px;
+      font-style: italic;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      background-color: #0728ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #23e9ff;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logout-box">
+    <h2>Logged Out Successfully</h2>
+    <p id="quote">Loading your farewell quote...</p>
+    <a href="login.html" class="btn">Back to Login</a>
+  </div>
+
+  <script>
+    const quotes = [
+      "“Every ending is just a new beginning.”",
+      "“Logged out, but still tuned in to life.”",
+      "“Goodbyes are not forever. See you soon!”",
+      "“Logging out... so you can log into reality.”",
+      "“Until next time, stay awesome!”",
+      "“Logged out, but the adventure continues.”",
+      "“Your next chapter starts now.”",
+      "“Take a break, refresh your mind, and come back stronger.”"
+    ];
+
+    document.getElementById("quote").innerText =
+      quotes[Math.floor(Math.random() * quotes.length)];
+  </script>
+
+</body>
+</html>
